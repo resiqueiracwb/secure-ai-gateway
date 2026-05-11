@@ -39,3 +39,8 @@ class PromptRequest(BaseModel):
     tags: Optional[List[str]] = None
 
     metadata: Optional[Metadata] = None
+
+class PromptResponse(BaseModel):
+    message: str
+    provider: str
+    normalized_prompt: str
