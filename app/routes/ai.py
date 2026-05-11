@@ -1,6 +1,7 @@
 from enum import Enum
 
 from fastapi import APIRouter, status
+from app.utils.logger import logger
 
 from app.models.prompt_models import (
     PromptRequest,
@@ -20,9 +21,15 @@ router = APIRouter(
     description="Receives and validates AI prompt requests"
 )
 def process_prompt(request: PromptRequest):
-
+    logger.info(
+        f"Received prompt request using provider={request.provider}"
+    )
     normalized = AIService.process_prompt(
         request.prompt
+    )
+
+    logger.info(
+        "Prompt processed successfully"
     )
 
     return PromptResponse(
