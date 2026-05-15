@@ -1,7 +1,14 @@
+from typing import Any, Optional
+
 from pydantic import BaseModel
-from typing import Any
+
+
+class ErrorResponse(BaseModel):
+    code: str
+    message: str
 
 
 class BaseResponse(BaseModel):
     success: bool
-    data: Any
+    data: Optional[Any] = None
+    error: Optional[ErrorResponse] = None

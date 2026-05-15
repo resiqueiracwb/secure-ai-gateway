@@ -24,8 +24,10 @@ def process_prompt(request: PromptRequest):
     logger.info(
         f"Received prompt request using provider={request.provider}"
     )
+
     normalized = AIService.process_prompt(
-        request.prompt
+        request.prompt,
+        request.provider.value
     )
 
     logger.info(
