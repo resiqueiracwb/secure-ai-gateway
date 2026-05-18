@@ -14,16 +14,24 @@ from app.models.auth_models import (
     LoginRequest
 )
 
-from app.security.fake_users import (
-    fake_users_db
-)
-
 from app.security.password_handler import (
     verify_password
 )
 
 from app.security.jwt_handler import (
     create_access_token
+)
+
+from fastapi import Depends
+
+from sqlalchemy.orm import Session
+
+from app.database.dependencies import (
+    get_db
+)
+
+from app.repositories.user_repository import (
+    UserRepository
 )
 
 router = APIRouter(
@@ -34,10 +42,11 @@ router = APIRouter(
 
 @router.post("/login")
 def login(
-    request: LoginRequest
+    request: LoginRequest,
+    db: Session = Depends(get_db)
 ):
-
-    user = fake_users_db.get(
+    user = UserRepository.get_by_username(
+        db,
         request.username
     )
 
@@ -50,7 +59,7 @@ def login(
 
     valid_password = verify_password(
         request.password,
-        user["password"]
+        user.password
     )
 
     if not valid_password:
@@ -62,8 +71,8 @@ def login(
 
     access_token = create_access_token(
         data={
-            "sub": user["username"],
-            "role": user["role"]
+            "sub": user.username,
+            "role": user.role
         }
     )
 

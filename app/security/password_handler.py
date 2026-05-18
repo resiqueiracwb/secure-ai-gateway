@@ -13,9 +13,6 @@ def verify_password(
     hashed_password: str
 ):
 
-    print("PLAIN:", plain_password)
-    print("HASH:", hashed_password)
-
     return pwd_context.verify(
         plain_password,
         hashed_password
