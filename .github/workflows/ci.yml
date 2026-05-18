@@ -63,7 +63,11 @@ jobs:
 
       - name: Run migrations
         run: |
-          alembic upgrade head     
+          alembic upgrade head
+
+      - name: Seed test user
+        run: |
+          python seed_test_user.py    
 
       - name: Run tests
         run: |
