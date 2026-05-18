@@ -18,6 +18,16 @@ from app.routes.auth import (
     router as auth_router
 )
 
+from app.database.connection import (
+    engine
+)
+
+from app.database.base import Base
+
+from app.entities.user_entity import (
+    UserEntity
+)
+
 
 app = FastAPI(
     title=settings.APP_NAME or "Secure AI Gateway",
@@ -36,3 +46,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+
+Base.metadata.create_all(
+    bind=engine
+)
