@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+
+  api:
+    build: .
+    container_name: secure-ai-api
+
+    ports:
+      - "8001:8000"
+
+    volumes:
+      - .:/app
+
+    env_file:
+      - .env
+
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+
+    container_name: secure-ai-postgres
+
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: secure_ai_gateway
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

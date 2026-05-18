@@ -20,8 +20,8 @@ from app.routes.auth import (
 
 
 app = FastAPI(
-    title=settings.APP_NAME,
-    version=settings.APP_VERSION,
+    title=settings.APP_NAME or "Secure AI Gateway",
+    version=settings.APP_VERSION or "1.0.0",
     description="Modern AI-ready backend API"
 )
 app.include_router(ai_router)
