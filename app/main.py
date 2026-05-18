@@ -14,6 +14,10 @@ from app.middleware.logging_middleware import (
     LoggingMiddleware
 )
 
+from app.routes.auth import (
+    router as auth_router
+)
+
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -30,3 +34,5 @@ app.add_exception_handler(
 app.add_middleware(
     LoggingMiddleware
 )
+
+app.include_router(auth_router)
