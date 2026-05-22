@@ -1,9 +1,12 @@
 from datetime import datetime, timedelta
 
 from jose import jwt, JWTError
+from app.core.settings import (
+    settings
+)
 
 
-SECRET_KEY = "super-secret-key"
+SECRET_KEY = settings.JWT_SECRET
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
