@@ -28,12 +28,27 @@ from app.entities.user_entity import (
     UserEntity
 )
 
+from app.middleware.request_context_middleware import (
+    RequestContextMiddleware
+)
+
+from app.routes.health import (
+    router as health_router
+)
+from app.core.settings import (
+    settings
+)
+
 
 app = FastAPI(
-    title=settings.APP_NAME or "Secure AI Gateway",
-    version=settings.APP_VERSION or "1.0.0",
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
     description="Modern AI-ready backend API"
 )
+app.add_middleware(
+    RequestContextMiddleware
+)
+
 app.include_router(ai_router)
 
 app.add_exception_handler(
@@ -45,4 +60,7 @@ app.add_middleware(
     LoggingMiddleware
 )
 
+app.include_router(
+    health_router
+)
 app.include_router(auth_router)
