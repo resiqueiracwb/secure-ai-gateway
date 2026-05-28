@@ -38,6 +38,9 @@ from app.routes.health import (
 from app.core.settings import (
     settings
 )
+from app.routes.async_demo import (
+    router as async_demo_router
+)
 
 
 app = FastAPI(
@@ -62,5 +65,8 @@ app.add_middleware(
 
 app.include_router(
     health_router
+)
+app.include_router(
+    async_demo_router
 )
 app.include_router(auth_router)
