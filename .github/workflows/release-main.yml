@@ -3,6 +3,9 @@ name: Release Develop into Main
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   merge-develop-into-main:
 
