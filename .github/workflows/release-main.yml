@@ -1,0 +1,36 @@
+name: Release Develop into Main
+
+on:
+
+  workflow_dispatch:
+
+jobs:
+
+  merge-develop-into-main:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Checkout main
+        run: |
+          git checkout main
+          git pull origin main
+
+      - name: Merge develop into main
+        run: |
+          git merge origin/develop --no-ff -m "release: develop -> main"
+
+      - name: Push main
+        run: |
+          git push origin main
