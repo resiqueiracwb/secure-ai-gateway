@@ -32,3 +32,14 @@ async def delete_cache(
     await redis_client.delete(
         key
     )
+
+
+async def ping_cache() -> bool:
+
+    try:
+
+        return await redis_client.ping()
+
+    except Exception:
+
+        return False
