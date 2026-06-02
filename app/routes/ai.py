@@ -25,7 +25,7 @@ router = APIRouter(
     summary="Process AI prompt",
     description="Receives and validates AI prompt requests"
 )
-def process_prompt(
+async def process_prompt(
     request: PromptRequest,
     current_user: dict = Depends(
         require_admin
@@ -37,7 +37,7 @@ def process_prompt(
         f"using provider={request.provider}"
     )
 
-    normalized = AIService.process_prompt(
+    normalized = await AIService.process_prompt(
         request.prompt,
         request.provider.value
     )

@@ -66,6 +66,30 @@ class JsonFormatter(
                 "latency_ms"
             ] = record.latency_ms
 
+        if hasattr(
+            record,
+            "cache_key"
+        ):
+            log_record["cache_key"] = (
+                record.cache_key
+            )
+
+        if hasattr(
+            record,
+            "provider"
+        ):
+            log_record["provider"] = (
+                record.provider
+            )
+
+        if hasattr(
+            record,
+            "ttl"
+        ):
+            log_record["ttl"] = (
+                record.ttl
+            )
+
         return json.dumps(
             log_record
         )

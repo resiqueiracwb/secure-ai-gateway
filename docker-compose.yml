@@ -17,6 +17,7 @@ services:
 
     depends_on:
       - postgres
+      - redis
 
   postgres:
     image: postgres:16
@@ -33,6 +34,11 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  redis:
+    image: redis:7
+    container_name: secure-ai-redis
+    ports:
+      - "6379:6379"
 
 volumes:
   postgres_data:

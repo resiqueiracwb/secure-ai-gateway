@@ -1,258 +1,309 @@
 # Secure AI Gateway
 
-Secure AI Gateway is a FastAPI backend for protected AI prompt processing. It includes JWT authentication, role-based authorization, PostgreSQL persistence, database migrations with Alembic, Docker Compose setup, request logging, and automated tests.
+Secure AI Gateway is a production-oriented backend project built to simulate a real-world AI Gateway platform.
 
-## Tech Stack
+The project was designed as a learning journey covering:
 
-- Python 3.12
-- FastAPI
-- PostgreSQL 16
-- SQLAlchemy
-- Alembic
-- Pydantic Settings
-- JWT authentication
-- Docker Compose
-- Pytest
+* Backend Engineering
+* Cloud-Native Development
+* Distributed Systems
+* Observability
+* CI/CD
+* Infrastructure Engineering
+* Production Readiness
 
-## Project Structure
+---
 
-```text
-app/
-  core/          Application settings
-  database/      SQLAlchemy engine, session, and dependencies
-  entities/      Database entities
-  middleware/    Logging and request context middleware
-  models/        Pydantic request/response models
-  repositories/  Data access layer
-  routes/        API routes
-  security/      JWT, password hashing, auth dependencies
-  services/      Business logic
-  tests/         Test suite
-alembic/         Database migrations
-docker-compose.yml
-Dockerfile
-seed_test_user.py
-```
-
-## Environment Variables
-
-Create a `.env` file in the project root:
-
-```env
-APP_NAME=Secure AI Gateway
-APP_VERSION=1.0.0
-DATABASE_URL=postgresql://admin:admin@postgres:5432/secure_ai_gateway
-JWT_SECRET=my-super-secret-key
-DEBUG=true
-```
-
-For local commands outside Docker, use:
-
-```env
-DATABASE_URL=postgresql://admin:admin@localhost:5432/secure_ai_gateway
-```
-
-Inside Docker Compose, `postgres` is the correct database hostname. On your host machine, use `localhost`.
-
-## Running With Docker
-
-Build and start the API plus PostgreSQL:
-
-```bash
-docker compose up --build
-```
-
-The API runs inside the container on port `8000`, and Docker exposes it on your machine at:
+# Architecture
 
 ```text
-http://localhost:8001
+Client
+   │
+   ▼
+FastAPI
+   │
+   ├── JWT Authentication
+   ├── RBAC Authorization
+   ├── AI Service Layer
+   ├── Redis Cache Layer
+   ├── Structured Logging
+   └── Health Checks
+           │
+           ▼
+      PostgreSQL
+
+           +
+           ▼
+
+        Redis
 ```
 
-Open the interactive API docs:
+---
+
+# Current Features
+
+## Authentication
+
+* JWT Authentication
+* Password Hashing
+* Protected Endpoints
+* Token Validation
+
+---
+
+## Authorization
+
+Role-Based Access Control (RBAC)
+
+Supported Roles:
+
+* admin
+* user
+
+---
+
+## AI Gateway
+
+Supported Providers:
+
+* OpenAI
+* Claude
+* Gemini
+
+Provider validation is performed before request processing.
+
+---
+
+## Redis Cache Layer
+
+The application uses Redis as a distributed cache.
+
+Implemented using the Cache-Aside Pattern.
+
+Flow:
 
 ```text
-http://localhost:8001/docs
+Request
+   │
+   ▼
+Redis Lookup
+   │
+   ├── Cache Hit
+   │      └── Return Response
+   │
+   └── Cache Miss
+           │
+           ▼
+      Process Request
+           │
+           ▼
+      Store In Redis
+           │
+           ▼
+      Return Response
 ```
 
-Check service status:
+Benefits:
 
-```bash
-docker compose ps
-```
+* Reduced latency
+* Reduced provider usage
+* Reduced infrastructure load
+* Distributed caching foundation
 
-View API logs:
+---
 
-```bash
-docker compose logs api
-```
+## Observability
 
-Stop the stack:
+Implemented:
 
-```bash
-docker compose down
-```
+* Structured JSON Logs
+* Request Correlation IDs
+* Request Lifecycle Logging
+* Latency Tracking
+* Cache Events
 
-## Database Setup
+Examples:
 
-Run migrations from your host machine:
+* CACHE HIT
+* CACHE MISS
+* CACHE SET
 
-```bash
-alembic upgrade head
-```
+---
 
-Seed the default test/admin user:
+## Health Checks
 
-```bash
-python seed_test_user.py
-```
-
-Default seeded credentials:
-
-```text
-username: renato
-password: 123456
-role: admin
-```
-
-## Local Development
-
-Create and activate a virtual environment:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Run the API locally:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-When running locally outside Docker, make sure `DATABASE_URL` points to `localhost`, not `postgres`.
-
-## API Endpoints
-
-### Health
+Endpoints:
 
 ```http
 GET /health
-GET /health/live
-GET /health/ready
 ```
 
-### Authentication
+Checks:
 
-```http
-POST /auth/login
-```
+* API Availability
+* Database Connectivity
+* Redis Connectivity
 
-Request body:
+---
 
-```json
-{
-  "username": "renato",
-  "password": "123456"
-}
-```
+## Database
 
-Response:
+PostgreSQL
 
-```json
-{
-  "access_token": "...",
-  "token_type": "bearer"
-}
-```
+Managed using:
 
-### AI Prompt
+* SQLAlchemy
+* Alembic Migrations
 
-```http
-POST /ai/prompt
-```
+---
 
-Requires a bearer token from `/auth/login`.
+## Docker
 
-Request body:
+Services:
 
-```json
-{
-  "prompt": "Explain FastAPI security",
-  "provider": "openai",
-  "temperature": 0.7,
-  "max_tokens": 200,
-  "tags": ["security", "fastapi"],
-  "metadata": {
-    "source": "docs",
-    "priority": 3
-  }
-}
-```
+* FastAPI
+* PostgreSQL
+* Redis
 
-Supported providers:
+Containerized using Docker Compose.
+
+---
+
+## CI/CD
+
+GitHub Actions Pipeline
+
+Pipeline executes:
+
+* Dependency Installation
+* Automated Tests
+* Database Migration Validation
+
+---
+
+# Git Workflow
+
+Branch Strategy:
 
 ```text
-openai
-claude
-gemini
+main
+  ▲
+develop
+  ▲
+feature/*
 ```
 
-## Example Requests
-
-Login:
-
-```bash
-curl -X POST http://localhost:8001/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"renato","password":"123456"}'
-```
-
-Call the AI prompt endpoint:
-
-```bash
-curl -X POST http://localhost:8001/ai/prompt \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <ACCESS_TOKEN>" \
-  -d '{"prompt":"Explain FastAPI security","provider":"openai"}'
-```
-
-## Running Tests
-
-Run all tests:
-
-```bash
-pytest
-```
-
-Or with the project virtual environment:
-
-```bash
-.venv/bin/pytest -q app/tests
-```
-
-The tests expect a PostgreSQL database to be available at:
+Workflow:
 
 ```text
-postgresql://admin:admin@localhost:5432/secure_ai_gateway
+feature/*
+      │
+      ▼
+develop
+      │
+      ▼
+main
 ```
 
-## CI
+Production releases are performed from:
 
-GitHub Actions runs the test suite using a PostgreSQL service container. In CI, the database is exposed to the runner at `localhost:5432`, so the workflow sets:
-
-```env
-DATABASE_URL=postgresql://admin:admin@localhost:5432/secure_ai_gateway
+```text
+develop → main
 ```
 
-## Notes
+using the release workflow.
 
-- Use `http://localhost:8001/docs` when running with Docker Compose.
-- Use `docker compose logs api` for API logs. The Compose service name is `api`; the container name is `secure-ai-api`.
-- A missing bearer token returns `401 Unauthorized`.
-- A valid token without admin role returns `403 Forbidden`.
+---
+
+# Technology Stack
+
+Backend:
+
+* Python 3.12
+* FastAPI
+
+Database:
+
+* PostgreSQL
+* SQLAlchemy
+* Alembic
+
+Caching:
+
+* Redis
+
+Authentication:
+
+* JWT
+
+Infrastructure:
+
+* Docker
+* Docker Compose
+
+CI/CD:
+
+* GitHub Actions
+
+Observability:
+
+* Structured Logging
+* Correlation IDs
+
+---
+
+# Learning Roadmap
+
+## Phase 1
+
+* FastAPI Foundations
+* Authentication
+* Authorization
+* PostgreSQL
+* Docker
+
+Completed
+
+---
+
+## Phase 2
+
+* Migrations
+* CI/CD
+* Logging
+* Health Checks
+* Async Foundations
+* Observability Foundations
+
+Completed
+
+---
+
+## Phase 3 (In Progress)
+
+* Redis Caching
+* Rate Limiting
+* Distributed Systems
+* OpenTelemetry
+* Queue Processing
+* Cloud-Native Patterns
+
+---
+
+# Future Enhancements
+
+* OpenTelemetry Tracing
+* Redis Metrics
+* Rate Limiting
+* Kafka Integration
+* Background Workers
+* Kubernetes Deployment
+* Multi-Provider Failover
+* Distributed Tracing
+* Resilience Patterns
+
+---
+
+# Project Goal
+
+The goal of this project is not only to build APIs but to progressively evolve into a production-grade cloud-native backend platform while learning modern backend engineering practices used in large-scale systems.
