@@ -4,10 +4,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pull-requests: write
 
 jobs:
-  merge-develop-into-main:
+  open-release-pr:
 
     runs-on: ubuntu-latest
 
@@ -18,20 +19,34 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Configure Git
+      - name: Create or reuse release pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          set -euo pipefail
 
-      - name: Checkout main
-        run: |
-          git checkout main
-          git pull origin main
+          git fetch origin main develop
 
-      - name: Merge develop into main
-        run: |
-          git merge origin/develop --no-ff -m "release: develop -> main"
+          commits_to_release="$(git rev-list --count origin/main..origin/develop)"
+          if [ "$commits_to_release" -eq 0 ]; then
+            echo "No commits to release from develop into main."
+            exit 0
+          fi
 
-      - name: Push main
-        run: |
-          git push origin main
+          existing_pr="$(gh pr list \
+            --base main \
+            --head develop \
+            --state open \
+            --json url \
+            --jq '.[0].url // empty')"
+
+          if [ -n "$existing_pr" ]; then
+            echo "Release pull request already exists: $existing_pr"
+            exit 0
+          fi
+
+          gh pr create \
+            --base main \
+            --head develop \
+            --title "release: develop -> main" \
+            --body "Automated release pull request from develop into main."
