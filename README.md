@@ -1,42 +1,142 @@
 # Secure AI Gateway
 
-Secure AI Gateway is a production-oriented backend project built to simulate a real-world AI Gateway platform.
+Secure AI Gateway is an enterprise-grade backend platform created to simulate how modern AI services are designed, built, and operated in production environments.
 
-The project was designed as a learning journey covering:
+Rather than being a collection of isolated technologies, this project follows the architecture, engineering practices, and cloud-native principles adopted by modern software engineering teams.
 
-* Backend Engineering
-* Cloud-Native Development
-* Distributed Systems
-* Observability
-* CI/CD
-* Infrastructure Engineering
-* Production Readiness
+Every feature introduced into this repository solves a real engineering problem and represents one step in the evolution from a simple REST API into a production-ready distributed platform.
 
 ---
 
-# Architecture
+# Vision
+
+The purpose of this project is to document the complete engineering journey of building an Enterprise AI Gateway from scratch.
+
+The repository evolves incrementally through multiple engineering disciplines:
+
+- Software Engineering
+- Backend Development
+- Cloud Computing
+- Distributed Systems
+- Infrastructure Engineering
+- Observability
+- AI Engineering
+- MLOps
+
+Each new concept is immediately applied to the project, making this repository both a production-ready application and a long-term engineering knowledge base.
+
+---
+
+# Engineering Philosophy
+
+This repository follows one simple principle:
+
+> Technologies are adopted to solve engineering problems — never to decorate a résumé.
+
+Every architectural decision answers three questions:
+
+1. What problem does this solve?
+2. Why is it better than the current solution?
+3. What trade-offs does it introduce?
+
+This philosophy guides the entire evolution of the Secure AI Gateway.
+
+---
+
+# Current Architecture
 
 ```text
-Client
-   │
-   ▼
-FastAPI
-   │
-   ├── JWT Authentication
-   ├── RBAC Authorization
-   ├── AI Service Layer
-   ├── Redis Cache Layer
-   ├── Structured Logging
-   └── Health Checks
-           │
-           ▼
-      PostgreSQL
-
-           +
-           ▼
-
-        Redis
+                   Client
+                      │
+                      ▼
+                 FastAPI API
+                      │
+      ┌───────────────┼────────────────┐
+      │               │                │
+      ▼               ▼                ▼
+ Authentication   AI Services      Health Checks
+      │               │
+      └───────────────┼───────────────┐
+                      ▼
+                Business Layer
+                      │
+        ┌─────────────┴─────────────┐
+        ▼                           ▼
+    PostgreSQL                  Redis Cache
 ```
+
+---
+
+# Architecture Evolution
+
+This project evolves through multiple production stages.
+
+### Version 1
+
+```
+FastAPI
+    │
+PostgreSQL
+```
+
+---
+
+### Version 2
+
+```
+FastAPI
+    │
+Redis
+    │
+PostgreSQL
+```
+
+---
+
+### Version 3
+
+```
+FastAPI
+    │
+Redis
+    │
+AWS Services
+    │
+SQS
+    │
+Lambda
+```
+
+---
+
+### Version 4
+
+```
+Kubernetes
+    │
+Microservices
+    │
+Observability
+    │
+Distributed Platform
+```
+
+---
+
+# Engineering Principles
+
+The project adopts engineering practices commonly found in enterprise software.
+
+- Clean Architecture
+- SOLID
+- Repository Pattern
+- Dependency Injection
+- Separation of Concerns
+- Twelve-Factor App
+- Infrastructure as Code
+- Cloud-Native Design
+- Production-First Mindset
+- Observability First
 
 ---
 
@@ -44,10 +144,10 @@ FastAPI
 
 ## Authentication
 
-* JWT Authentication
-* Password Hashing
-* Protected Endpoints
-* Token Validation
+- JWT Authentication
+- Password Hashing
+- Protected Endpoints
+- Token Validation
 
 ---
 
@@ -55,60 +155,53 @@ FastAPI
 
 Role-Based Access Control (RBAC)
 
-Supported Roles:
+Supported roles:
 
-* admin
-* user
+- Admin
+- User
 
 ---
 
 ## AI Gateway
 
-Supported Providers:
+Supported providers:
 
-* OpenAI
-* Claude
-* Gemini
+- OpenAI
+- Claude
+- Gemini
 
-Provider validation is performed before request processing.
+Provider validation occurs before request processing.
 
 ---
 
 ## Redis Cache Layer
 
-The application uses Redis as a distributed cache.
-
-Implemented using the Cache-Aside Pattern.
+The application implements the Cache-Aside Pattern.
 
 Flow:
 
 ```text
 Request
    │
-   ▼
 Redis Lookup
    │
-   ├── Cache Hit
-   │      └── Return Response
-   │
-   └── Cache Miss
-           │
-           ▼
-      Process Request
-           │
-           ▼
-      Store In Redis
-           │
-           ▼
-      Return Response
+ ├── Cache Hit
+ │
+ └── Cache Miss
+        │
+ Business Logic
+        │
+ Store Cache
+        │
+ Response
 ```
 
 Benefits:
 
-* Reduced latency
-* Reduced provider usage
-* Reduced infrastructure load
-* Distributed caching foundation
+- Reduced latency
+- Reduced AI provider usage
+- Lower infrastructure costs
+- Foundation for distributed caching
 
 ---
 
@@ -116,151 +209,144 @@ Benefits:
 
 Implemented:
 
-* Structured JSON Logs
-* Request Correlation IDs
-* Request Lifecycle Logging
-* Latency Tracking
-* Cache Events
+- Structured JSON Logging
+- Correlation IDs
+- Request Lifecycle Logging
+- Latency Tracking
+- Cache Metrics
 
-Examples:
+Events:
 
-* CACHE HIT
-* CACHE MISS
-* CACHE SET
+- CACHE HIT
+- CACHE MISS
+- CACHE SET
 
 ---
 
 ## Health Checks
 
-Endpoints:
+Endpoint:
 
-```http
+```
 GET /health
 ```
 
-Checks:
+Current checks:
 
-* API Availability
-* Database Connectivity
-* Redis Connectivity
+- API Availability
+- PostgreSQL
+- Redis
 
 ---
 
-## Database
+# Technology Decisions
 
-PostgreSQL
+Instead of simply listing technologies, this section explains why they were chosen.
 
-Managed using:
+## FastAPI
 
-* SQLAlchemy
-* Alembic Migrations
+Chosen because:
+
+- High performance
+- Native async support
+- Automatic OpenAPI generation
+- Excellent developer experience
+
+---
+
+## PostgreSQL
+
+Chosen because:
+
+- ACID compliance
+- Mature ecosystem
+- Production-ready relational database
+
+---
+
+## Redis
+
+Chosen because:
+
+- Extremely low latency
+- Distributed caching
+- Session storage
+- Future queue integration
 
 ---
 
 ## Docker
 
-Services:
+Chosen because:
 
-* FastAPI
-* PostgreSQL
-* Redis
-
-Containerized using Docker Compose.
+- Environment consistency
+- Reproducible deployments
+- Simplified onboarding
+- Cloud portability
 
 ---
 
-## CI/CD
+## GitHub Actions
 
-GitHub Actions Pipeline
+Chosen because:
 
-Pipeline executes:
+- Automated CI
+- Pull Request validation
+- Release automation
 
-* Dependency Installation
-* Automated Tests
-* Database Migration Validation
+---
+
+# Docker Environment
+
+Current services:
+
+- FastAPI
+- PostgreSQL
+- Redis
+
+Managed using Docker Compose.
 
 ---
 
 # Git Workflow
 
-Branch Strategy:
+Branch strategy:
 
-```text
+```
 main
-  ▲
+ ▲
 develop
-  ▲
+ ▲
 feature/*
 ```
 
-Workflow:
+Release flow:
 
-```text
+```
 feature/*
       │
-      ▼
 develop
       │
-      ▼
 main
 ```
 
-Production releases are performed from:
-
-```text
-develop → main
-```
-
-using the release workflow.
+Production releases are created through automated GitHub Actions workflows.
 
 ---
 
-# Technology Stack
-
-Backend:
-
-* Python 3.12
-* FastAPI
-
-Database:
-
-* PostgreSQL
-* SQLAlchemy
-* Alembic
-
-Caching:
-
-* Redis
-
-Authentication:
-
-* JWT
-
-Infrastructure:
-
-* Docker
-* Docker Compose
-
-CI/CD:
-
-* GitHub Actions
-
-Observability:
-
-* Structured Logging
-* Correlation IDs
-
----
-
-# Learning Roadmap
+# Engineering Roadmap
 
 ## Phase 1
 
-* FastAPI Foundations
-* Authentication
-* Authorization
-* PostgreSQL
-* Docker
+✔ FastAPI
+
+✔ PostgreSQL
+
+✔ JWT Authentication
+
+✔ RBAC
+
+✔ Docker
 
 Completed
 
@@ -268,42 +354,83 @@ Completed
 
 ## Phase 2
 
-* Migrations
-* CI/CD
-* Logging
-* Health Checks
-* Async Foundations
-* Observability Foundations
+✔ Alembic
+
+✔ Logging
+
+✔ Health Checks
+
+✔ Redis
+
+✔ CI/CD
 
 Completed
 
 ---
 
-## Phase 3 (In Progress)
+## Phase 3
 
-* Redis Caching
-* Rate Limiting
-* Distributed Systems
-* OpenTelemetry
-* Queue Processing
-* Cloud-Native Patterns
+In Progress
+
+- OpenTelemetry
+- Distributed Cache Improvements
+- Rate Limiting
+- Background Processing
+- Cloud Architecture
 
 ---
 
-# Future Enhancements
+## Phase 4
 
-* OpenTelemetry Tracing
-* Redis Metrics
-* Rate Limiting
-* Kafka Integration
-* Background Workers
-* Kubernetes Deployment
-* Multi-Provider Failover
-* Distributed Tracing
-* Resilience Patterns
+Planned
+
+- AWS
+- S3
+- Lambda
+- DynamoDB
+- SQS
+- Secrets Manager
+- Terraform
+
+---
+
+## Phase 5
+
+Planned
+
+- Kubernetes
+- Horizontal Scaling
+- Distributed Tracing
+- Prometheus
+- Grafana
+
+---
+
+# Engineering Documentation
+
+The complete engineering documentation is developed alongside the project.
+
+It includes:
+
+- Architecture Decisions (ADR)
+- Engineering Notes
+- Design Diagrams
+- Technical Books
+- Interview Preparation
+- Learning Journey
 
 ---
 
 # Project Goal
 
-The goal of this project is not only to build APIs but to progressively evolve into a production-grade cloud-native backend platform while learning modern backend engineering practices used in large-scale systems.
+The objective of this repository is not only to build APIs.
+
+The real goal is to document the complete journey from a simple backend application to an enterprise cloud-native AI platform while following software engineering best practices used by modern technology companies.
+
+Every commit represents one engineering decision.
+
+Every milestone represents one architectural evolution.
+
+The destination is not simply a finished application.
+
+The destination is becoming a better software engineer.
